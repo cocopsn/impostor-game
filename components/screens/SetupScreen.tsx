@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus, Minus, Play, ToggleLeft, ToggleRight,
-  Clock, Pencil, ArrowLeft, CheckCheck, XCircle
+  Clock, Pencil, ArrowLeft, CheckCheck, XCircle,
+  Smartphone, Hand
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import PlayerBadge from '@/components/ui/PlayerBadge';
@@ -278,6 +279,51 @@ export default function SetupScreen({ state, actions }: SetupScreenProps) {
             </motion.div>
           )}
         </AnimatePresence>
+      </section>
+
+      {/* Voting mode */}
+      <section className="mb-8">
+        <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">
+          Modo de votación
+        </h3>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={() => { if (config.votingMode !== 'manual') actions.toggleVotingMode(); }}
+            className={`
+              flex flex-col items-center gap-2 p-4 rounded-xl border transition-all duration-150
+              ${config.votingMode === 'manual'
+                ? 'bg-red-950/40 border-red-600/60 shadow-sm shadow-red-900/20'
+                : 'bg-zinc-900/60 border-zinc-700/40 hover:border-zinc-600'
+              }
+            `}
+          >
+            <Hand size={22} className={config.votingMode === 'manual' ? 'text-red-400' : 'text-zinc-500'} />
+            <span className={`text-sm font-medium ${config.votingMode === 'manual' ? 'text-red-200' : 'text-zinc-500'}`}>
+              En persona
+            </span>
+            <span className="text-[10px] text-zinc-600 text-center leading-tight">
+              Votan hablando y eligen quién sale
+            </span>
+          </button>
+          <button
+            onClick={() => { if (config.votingMode !== 'app') actions.toggleVotingMode(); }}
+            className={`
+              flex flex-col items-center gap-2 p-4 rounded-xl border transition-all duration-150
+              ${config.votingMode === 'app'
+                ? 'bg-red-950/40 border-red-600/60 shadow-sm shadow-red-900/20'
+                : 'bg-zinc-900/60 border-zinc-700/40 hover:border-zinc-600'
+              }
+            `}
+          >
+            <Smartphone size={22} className={config.votingMode === 'app' ? 'text-red-400' : 'text-zinc-500'} />
+            <span className={`text-sm font-medium ${config.votingMode === 'app' ? 'text-red-200' : 'text-zinc-500'}`}>
+              En la app
+            </span>
+            <span className="text-[10px] text-zinc-600 text-center leading-tight">
+              Cada jugador vota en secreto
+            </span>
+          </button>
+        </div>
       </section>
 
       {/* Start button */}

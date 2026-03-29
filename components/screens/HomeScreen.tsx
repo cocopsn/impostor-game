@@ -17,6 +17,31 @@ const instructions = [
   { icon: <Trophy size={18} />, title: 'Gana', desc: 'Inocentes ganan si eliminan a todos los impostores. Impostores ganan si sobreviven.' },
 ];
 
+function FloatingParticles() {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {Array.from({ length: 12 }).map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-1 h-1 rounded-full bg-red-500/30"
+          style={{ left: `${8 + (i * 7.5)}%` }}
+          animate={{
+            y: [600, -20],
+            opacity: [0, 0.6, 0.6, 0],
+            scale: [0, 1, 1, 0.5],
+          }}
+          transition={{
+            duration: 6 + Math.random() * 4,
+            delay: i * 0.8,
+            repeat: Infinity,
+            ease: 'easeOut',
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export default function HomeScreen({ onStart }: HomeScreenProps) {
   const [showRules, setShowRules] = useState(false);
 
@@ -25,30 +50,61 @@ export default function HomeScreen({ onStart }: HomeScreenProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, x: -30 }}
-      className="flex flex-col items-center justify-center min-h-dvh px-6 py-12"
+      className="relative flex flex-col items-center justify-center min-h-dvh px-6 py-12"
     >
+      <FloatingParticles />
+
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.6 }}
-        className="text-center mb-10"
+        className="text-center mb-10 relative z-10"
       >
+        {/* Animated mask icon with glow ring */}
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
+          initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-          className="text-7xl mb-4"
+          transition={{ delay: 0.2, type: 'spring', stiffness: 150, damping: 12 }}
+          className="relative inline-block mb-6"
         >
-          🎭
+          <motion.div
+            className="absolute inset-0 rounded-full"
+            style={{
+              background: 'radial-gradient(circle, rgba(220,38,38,0.15) 0%, transparent 70%)',
+              filter: 'blur(20px)',
+            }}
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.5, 0.8, 0.5],
+            }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <div className="relative text-8xl sm:text-9xl">🎭</div>
         </motion.div>
-        <h1 className="font-display text-7xl sm:text-8xl tracking-tight text-zinc-100 leading-none">
+
+        {/* Title with dramatic styling */}
+        <motion.h1
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
+          className="font-display text-8xl sm:text-9xl tracking-tight text-zinc-100 leading-none text-glow-word"
+        >
           IMPOSTOR
-        </h1>
+        </motion.h1>
+
+        {/* Decorative line */}
+        <motion.div
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ delay: 0.5, duration: 0.6 }}
+          className="h-px w-48 mx-auto mt-4 mb-3 bg-gradient-to-r from-transparent via-red-600/50 to-transparent"
+        />
+
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="text-zinc-500 text-lg mt-3 font-body"
+          transition={{ delay: 0.5 }}
+          className="text-zinc-500 text-lg font-body"
         >
           El juego de la palabra secreta
         </motion.p>
@@ -57,8 +113,8 @@ export default function HomeScreen({ onStart }: HomeScreenProps) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="w-full max-w-xs"
+        transition={{ delay: 0.6 }}
+        className="w-full max-w-xs relative z-10"
       >
         <Button onClick={onStart} fullWidth size="lg" icon={<Play size={20} />}>
           Nueva Partida
@@ -68,8 +124,8 @@ export default function HomeScreen({ onStart }: HomeScreenProps) {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.7 }}
-        className="w-full max-w-sm mt-10"
+        transition={{ delay: 0.8 }}
+        className="w-full max-w-sm mt-10 relative z-10"
       >
         <button
           onClick={() => setShowRules(!showRules)}
@@ -97,9 +153,9 @@ export default function HomeScreen({ onStart }: HomeScreenProps) {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.08 }}
-                    className="flex items-start gap-3 bg-zinc-900/60 border border-zinc-800 rounded-xl p-3"
+                    className="flex items-start gap-3 bg-zinc-900/60 border border-zinc-800/80 rounded-xl p-3 backdrop-blur-sm"
                   >
-                    <div className="shrink-0 w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-red-500">
+                    <div className="shrink-0 w-8 h-8 rounded-full bg-red-950/50 border border-red-900/30 flex items-center justify-center text-red-500">
                       {step.icon}
                     </div>
                     <div>

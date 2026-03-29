@@ -13,6 +13,7 @@ const initialState: GameState = {
     customWords: [],
     timerEnabled: false,
     timerDuration: 120,
+    votingMode: 'manual',
   },
   secretWord: '',
   secretCategory: '',
@@ -144,7 +145,23 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
 
+    case 'TOGGLE_VOTING_MODE':
+      return {
+        ...state,
+        config: {
+          ...state.config,
+          votingMode: state.config.votingMode === 'app' ? 'manual' : 'app',
+        },
+      };
+
     case 'GO_TO_VOTING': {
+      if (state.config.votingMode === 'manual') {
+        return {
+          ...state,
+          phase: 'manual-vote',
+          currentRoundVotes: [],
+        };
+      }
       return {
         ...state,
         phase: 'voting',
@@ -152,6 +169,47 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         votingStep: 'passing',
         currentRoundVotes: [],
       };
+    }
+
+    case 'MANUAL_ELIMINATE': {
+      const alivePlayers = state.config.players.filter(p => p.isAlive);
+      if (action.playerId) {
+        const eliminated = state.config.players.find(p => p.id === action.playerId) || null;
+        const updatedPlayers = state.config.players.map(p =>
+          p.id === action.playerId
+            ? { ...p, isAlive: false, eliminatedInRound: state.currentRound }
+            : p
+        );
+        const winCondition = checkWinCondition(updatedPlayers);
+        const result = {
+          roundNumber: state.currentRound,
+          votes: [] as { voterId: string; targetId: string | null }[],
+          eliminatedPlayer: eliminated,
+          wasTie: false,
+        };
+        return {
+          ...state,
+          phase: 'round-result',
+          config: { ...state.config, players: updatedPlayers },
+          rounds: [...state.rounds, result],
+          winner: winCondition,
+          currentRoundVotes: [],
+        };
+      } else {
+        const result = {
+          roundNumber: state.currentRound,
+          votes: [] as { voterId: string; targetId: string | null }[],
+          eliminatedPlayer: null,
+          wasTie: true,
+        };
+        return {
+          ...state,
+          phase: 'round-result',
+          rounds: [...state.rounds, result],
+          winner: null,
+          currentRoundVotes: [],
+        };
+      }
     }
 
     case 'VOTER_READY':
@@ -263,6 +321,8 @@ export function useGameState(): { state: GameState; actions: GameActions } {
     goToVoting: useCallback(() => dispatch({ type: 'GO_TO_VOTING' }), []),
     voterReady: useCallback(() => dispatch({ type: 'VOTER_READY' }), []),
     castVote: useCallback((targetId: string | null) => dispatch({ type: 'CAST_VOTE', targetId }), []),
+    toggleVotingMode: useCallback(() => dispatch({ type: 'TOGGLE_VOTING_MODE' }), []),
+    manualEliminate: useCallback((playerId: string | null) => dispatch({ type: 'MANUAL_ELIMINATE', playerId }), []),
     nextRound: useCallback(() => dispatch({ type: 'NEXT_ROUND' }), []),
     showGameOver: useCallback(() => dispatch({ type: 'SHOW_GAME_OVER' }), []),
     playAgain: useCallback(() => dispatch({ type: 'PLAY_AGAIN' }), []),

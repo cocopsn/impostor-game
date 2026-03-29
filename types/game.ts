@@ -13,6 +13,7 @@ export interface GameConfig {
   customWords: string[];
   timerEnabled: boolean;
   timerDuration: number;
+  votingMode: 'app' | 'manual';
 }
 
 export interface Vote {
@@ -33,6 +34,7 @@ export type GamePhase =
   | 'role-reveal'
   | 'playing'
   | 'voting'
+  | 'manual-vote'
   | 'round-result'
   | 'game-over';
 
@@ -67,6 +69,8 @@ export type GameAction =
   | { type: 'GO_TO_VOTING' }
   | { type: 'VOTER_READY' }
   | { type: 'CAST_VOTE'; targetId: string | null }
+  | { type: 'TOGGLE_VOTING_MODE' }
+  | { type: 'MANUAL_ELIMINATE'; playerId: string | null }
   | { type: 'NEXT_ROUND' }
   | { type: 'SHOW_GAME_OVER' }
   | { type: 'PLAY_AGAIN' }
@@ -89,6 +93,8 @@ export interface GameActions {
   goToVoting: () => void;
   voterReady: () => void;
   castVote: (targetId: string | null) => void;
+  toggleVotingMode: () => void;
+  manualEliminate: (playerId: string | null) => void;
   nextRound: () => void;
   showGameOver: () => void;
   playAgain: () => void;

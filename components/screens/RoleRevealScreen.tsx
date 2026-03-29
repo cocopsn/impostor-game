@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Skull, Eye, ChevronRight } from 'lucide-react';
+import { Shield, Eye, ChevronRight } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { GameState, GameActions } from '@/types/game';
 
@@ -78,13 +78,24 @@ export default function RoleRevealScreen({ state, actions }: RoleRevealScreenPro
               exit={{ opacity: 0, y: -20 }}
               className="text-center w-full max-w-sm"
             >
+              {/* Animated shield icon with ring */}
               <motion.div
                 initial={{ scale: 0.8 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring', stiffness: 200 }}
-                className="w-20 h-20 rounded-full bg-zinc-800 border-2 border-zinc-700 flex items-center justify-center mx-auto mb-6"
+                className="relative inline-block mb-6"
               >
-                <Shield size={32} className="text-zinc-400" />
+                <motion.div
+                  className="absolute inset-[-8px] rounded-full border border-zinc-700/50"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+                  style={{
+                    borderImage: 'conic-gradient(from 0deg, transparent 70%, rgba(220,38,38,0.3) 100%) 1',
+                  }}
+                />
+                <div className="w-20 h-20 rounded-full bg-zinc-800/80 border-2 border-zinc-700 flex items-center justify-center backdrop-blur-sm">
+                  <Shield size={32} className="text-zinc-400" />
+                </div>
               </motion.div>
 
               <p className="text-zinc-500 text-sm mb-2">Pasa el celular a</p>
@@ -108,23 +119,41 @@ export default function RoleRevealScreen({ state, actions }: RoleRevealScreenPro
               className="text-center w-full max-w-sm"
             >
               {isImpostor ? (
-                /* Impostor reveal */
+                /* Impostor reveal - more dramatic */
                 <motion.div
-                  className="rounded-2xl border border-red-800/60 p-8 relative overflow-hidden"
+                  className="rounded-2xl border border-red-800/60 p-8 relative overflow-hidden pulse-glow-red"
                   animate={{
                     backgroundColor: ['rgba(127,29,29,0.3)', 'rgba(153,27,27,0.5)', 'rgba(127,29,29,0.3)'],
                   }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-b from-red-900/20 to-transparent pointer-events-none" />
+                  {/* Red radial glow behind icon */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-red-900/20 via-transparent to-red-900/10 pointer-events-none" />
+                  <div
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full pointer-events-none"
+                    style={{
+                      background: 'radial-gradient(circle, rgba(220,38,38,0.15) 0%, transparent 70%)',
+                      filter: 'blur(30px)',
+                    }}
+                  />
+
+                  {/* Scanlines */}
+                  <div className="absolute inset-0 pointer-events-none scanlines" />
+
                   <motion.div
                     initial={{ scale: 0, rotate: -20 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
                     className="relative"
                   >
-                    <div className="text-6xl mb-4">🎭</div>
-                    <h2 className="font-display text-4xl text-red-400 mb-3 text-glow-red">
+                    <motion.div
+                      className="text-7xl mb-4"
+                      animate={{ scale: [1, 1.05, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      🎭
+                    </motion.div>
+                    <h2 className="font-display text-5xl text-red-400 mb-3 text-glow-red">
                       ERES EL IMPOSTOR
                     </h2>
                     <p className="text-red-300/70 text-sm">
@@ -133,16 +162,32 @@ export default function RoleRevealScreen({ state, actions }: RoleRevealScreenPro
                   </motion.div>
                 </motion.div>
               ) : (
-                /* Innocent reveal */
+                /* Innocent reveal - with glow */
                 <div>
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.1 }}
+                    className="text-4xl mb-2"
+                  >
+                    ✨
+                  </motion.div>
                   <p className="text-zinc-500 text-sm mb-2">Tu palabra es:</p>
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 }}
-                    className="my-6"
+                    className="my-6 relative"
                   >
-                    <h2 className="font-display text-5xl sm:text-6xl text-zinc-100 text-glow-word mb-3">
+                    {/* Glow behind word */}
+                    <div
+                      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-24 pointer-events-none"
+                      style={{
+                        background: 'radial-gradient(ellipse, rgba(244,244,245,0.06) 0%, transparent 70%)',
+                        filter: 'blur(20px)',
+                      }}
+                    />
+                    <h2 className="font-display text-5xl sm:text-6xl text-zinc-100 text-glow-word mb-3 relative">
                       <DecryptText text={state.secretWord.toUpperCase()} />
                     </h2>
                     <motion.p

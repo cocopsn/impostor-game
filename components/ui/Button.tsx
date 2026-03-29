@@ -15,9 +15,9 @@ interface ButtonProps {
 }
 
 const variants = {
-  primary: 'bg-red-600 hover:bg-red-700 active:bg-red-800 text-white shadow-lg shadow-red-900/30',
-  secondary: 'bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-600 text-zinc-100 border border-zinc-600',
-  danger: 'bg-red-900/60 hover:bg-red-900/80 active:bg-red-900 text-red-200 border border-red-800',
+  primary: 'bg-red-600 hover:bg-red-700 active:bg-red-800 text-white shadow-lg shadow-red-900/40 hover:shadow-red-800/50',
+  secondary: 'bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-600 text-zinc-100 border border-zinc-600 hover:border-zinc-500',
+  danger: 'bg-red-900/60 hover:bg-red-900/80 active:bg-red-900 text-red-200 border border-red-800 shadow-lg shadow-red-950/30',
   ghost: 'bg-transparent hover:bg-zinc-800/50 active:bg-zinc-800 text-zinc-300',
 };
 

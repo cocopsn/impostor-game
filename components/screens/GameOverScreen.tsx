@@ -1,41 +1,78 @@
 'use client';
 
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Skull, RotateCcw, Home, Eye } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import PlayerBadge from '@/components/ui/PlayerBadge';
 import Modal from '@/components/ui/Modal';
 import { GameState, GameActions } from '@/types/game';
-import { useState } from 'react';
 
 interface GameOverScreenProps {
   state: GameState;
   actions: GameActions;
 }
 
-const confettiColors = ['#DC2626', '#F59E0B', '#EF4444', '#FBBF24', '#FCA5A5'];
+const confettiColors = ['#DC2626', '#F59E0B', '#EF4444', '#FBBF24', '#FCA5A5', '#B91C1C', '#D97706'];
+
+interface ConfettiPiece {
+  id: number;
+  color: string;
+  left: string;
+  startY: number;
+  endY: number;
+  rotate: number;
+  xDrift: number;
+  duration: number;
+  delay: number;
+  size: number;
+  shape: 'circle' | 'rect';
+}
+
+function useConfettiPieces(count: number): ConfettiPiece[] {
+  return useMemo(() =>
+    Array.from({ length: count }, (_, i) => ({
+      id: i,
+      color: confettiColors[i % confettiColors.length],
+      left: `${Math.random() * 100}%`,
+      startY: -20,
+      endY: 820,
+      rotate: Math.random() * 720 - 360,
+      xDrift: Math.random() * 200 - 100,
+      duration: 2.5 + Math.random() * 2,
+      delay: Math.random() * 2,
+      size: 4 + Math.random() * 6,
+      shape: Math.random() > 0.5 ? 'circle' : 'rect' as const,
+    })),
+  [count]);
+}
 
 function Confetti() {
+  const pieces = useConfettiPieces(40);
+
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-      {Array.from({ length: 30 }).map((_, i) => (
+      {pieces.map(p => (
         <motion.div
-          key={i}
-          className="absolute w-2 h-2 rounded-full"
+          key={p.id}
+          className="absolute"
           style={{
-            backgroundColor: confettiColors[i % confettiColors.length],
-            left: `${Math.random() * 100}%`,
+            backgroundColor: p.color,
+            left: p.left,
+            width: p.size,
+            height: p.shape === 'rect' ? p.size * 2.5 : p.size,
+            borderRadius: p.shape === 'circle' ? '50%' : '2px',
           }}
-          initial={{ y: -20, opacity: 1, rotate: 0 }}
+          initial={{ y: p.startY, opacity: 1, rotate: 0, x: 0 }}
           animate={{
-            y: window?.innerHeight + 20 || 800,
+            y: p.endY,
             opacity: [1, 1, 0],
-            rotate: Math.random() * 720 - 360,
-            x: Math.random() * 200 - 100,
+            rotate: p.rotate,
+            x: p.xDrift,
           }}
           transition={{
-            duration: 2 + Math.random() * 2,
-            delay: Math.random() * 1.5,
+            duration: p.duration,
+            delay: p.delay,
             ease: 'easeOut',
           }}
         />
@@ -48,7 +85,6 @@ export default function GameOverScreen({ state, actions }: GameOverScreenProps) 
   const [showNewGameModal, setShowNewGameModal] = useState(false);
   const impostorsWon = state.winner === 'impostors';
   const impostors = state.config.players.filter(p => p.role === 'impostor');
-  const innocents = state.config.players.filter(p => p.role === 'innocent');
 
   return (
     <motion.div
@@ -66,29 +102,48 @@ export default function GameOverScreen({ state, actions }: GameOverScreenProps) 
         transition={{ delay: 0.2 }}
         className="text-center mb-8 relative z-10"
       >
+        {/* Glowing icon with halo */}
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ type: 'spring', stiffness: 200, delay: 0.3 }}
-          className={`
-            w-24 h-24 rounded-full border-2 flex items-center justify-center mx-auto mb-4
-            ${impostorsWon
-              ? 'bg-red-950/60 border-red-600 shadow-lg shadow-red-900/40'
-              : 'bg-amber-950/40 border-amber-600 shadow-lg shadow-amber-900/30'
-            }
-          `}
+          transition={{ type: 'spring', stiffness: 150, delay: 0.3 }}
+          className="relative inline-block mb-4"
         >
-          {impostorsWon
-            ? <Skull size={40} className="text-red-400" />
-            : <Trophy size={40} className="text-amber-400" />
-          }
+          <motion.div
+            className="absolute inset-[-20px] rounded-full"
+            style={{
+              background: impostorsWon
+                ? 'radial-gradient(circle, rgba(220,38,38,0.2) 0%, transparent 70%)'
+                : 'radial-gradient(circle, rgba(245,158,11,0.2) 0%, transparent 70%)',
+              filter: 'blur(15px)',
+            }}
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.5, 0.8, 0.5],
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+          <div className={`
+            relative w-24 h-24 rounded-full border-2 flex items-center justify-center
+            ${impostorsWon
+              ? 'bg-red-950/60 border-red-600 card-glow-red'
+              : 'bg-amber-950/40 border-amber-600 card-glow-gold'
+            }
+          `}>
+            {impostorsWon
+              ? <Skull size={40} className="text-red-400" />
+              : <Trophy size={40} className="text-amber-400" />
+            }
+          </div>
         </motion.div>
 
         <motion.h1
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5 }}
-          className={`font-display text-5xl sm:text-6xl mb-2 ${impostorsWon ? 'text-red-400' : 'text-amber-400'}`}
+          transition={{ delay: 0.5, type: 'spring' }}
+          className={`font-display text-5xl sm:text-6xl mb-2 ${
+            impostorsWon ? 'text-red-400 text-glow-red' : 'text-amber-400 text-glow-gold'
+          }`}
         >
           {impostorsWon ? 'IMPOSTORES GANAN' : 'INOCENTES GANAN'}
         </motion.h1>
@@ -105,18 +160,26 @@ export default function GameOverScreen({ state, actions }: GameOverScreenProps) 
         </motion.p>
       </motion.div>
 
-      {/* Secret word */}
+      {/* Secret word - with decorative borders */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
-        className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-5 mb-6 text-center relative z-10"
+        className="relative bg-zinc-900/60 border border-zinc-800 rounded-xl p-5 mb-6 text-center z-10"
       >
+        {/* Subtle glow behind word */}
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-20 pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse, rgba(244,244,245,0.04) 0%, transparent 70%)',
+            filter: 'blur(20px)',
+          }}
+        />
         <div className="flex items-center justify-center gap-2 text-zinc-500 text-xs uppercase tracking-wider mb-2">
           <Eye size={14} />
           <span>La palabra secreta era</span>
         </div>
-        <h2 className="font-display text-4xl text-zinc-100 text-glow-word">
+        <h2 className="font-display text-4xl text-zinc-100 text-glow-word relative">
           {state.secretWord.toUpperCase()}
         </h2>
         <p className="text-zinc-600 text-xs mt-1">{state.secretCategory}</p>
@@ -157,15 +220,16 @@ export default function GameOverScreen({ state, actions }: GameOverScreenProps) 
         <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3">
           Resumen de la partida
         </h3>
-        <div className="space-y-2">
+        <div className="space-y-1">
           {state.config.players.map(p => (
             <div
               key={p.id}
-              className={`flex items-center justify-between text-sm py-1.5 border-b border-zinc-800/50 last:border-0
+              className={`flex items-center justify-between text-sm py-2 border-b border-zinc-800/50 last:border-0
                 ${!p.isAlive ? 'opacity-50' : ''}
               `}
             >
               <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${p.role === 'impostor' ? 'bg-red-500' : 'bg-zinc-600'}`} />
                 <span className={p.role === 'impostor' ? 'text-red-400' : 'text-zinc-200'}>
                   {p.name}
                 </span>
@@ -178,7 +242,7 @@ export default function GameOverScreen({ state, actions }: GameOverScreenProps) 
                 </span>
               </div>
               <span className="text-xs text-zinc-600">
-                {p.isAlive ? 'Sobrevivió' : `Ronda ${p.eliminatedInRound}`}
+                {p.isAlive ? '✓ Sobrevivió' : `✗ Ronda ${p.eliminatedInRound}`}
               </span>
             </div>
           ))}

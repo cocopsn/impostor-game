@@ -31,10 +31,15 @@ body::after {
   inset: 0;
   z-index: 9999;
   pointer-events: none;
-  opacity: 0.025;
+  opacity: 0.03;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-repeat: repeat;
   background-size: 200px 200px;
+}
+
+/* Vignette */
+.bg-radial-vignette {
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%);
 }
 
 /* Font display class */
@@ -56,14 +61,108 @@ body::after {
 
 .text-glow-word {
   text-shadow:
-    0 0 30px rgba(244, 244, 245, 0.2),
-    0 0 60px rgba(244, 244, 245, 0.1);
+    0 0 30px rgba(244, 244, 245, 0.25),
+    0 0 60px rgba(244, 244, 245, 0.12),
+    0 0 100px rgba(244, 244, 245, 0.05);
 }
 
 .text-glow-gold {
   text-shadow:
     0 0 20px rgba(245, 158, 11, 0.5),
-    0 0 40px rgba(245, 158, 11, 0.25);
+    0 0 40px rgba(245, 158, 11, 0.25),
+    0 0 80px rgba(245, 158, 11, 0.1);
+}
+
+/* Card glow border */
+.card-glow-red {
+  box-shadow:
+    0 0 15px rgba(220, 38, 38, 0.1),
+    0 0 30px rgba(220, 38, 38, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.card-glow-gold {
+  box-shadow:
+    0 0 15px rgba(245, 158, 11, 0.1),
+    0 0 30px rgba(245, 158, 11, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* Animated border gradient */
+@keyframes border-rotate {
+  0% { --border-angle: 0deg; }
+  100% { --border-angle: 360deg; }
+}
+
+.animated-border {
+  position: relative;
+}
+
+.animated-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--border-angle, 0deg),
+    transparent 60%,
+    rgba(220, 38, 38, 0.4) 80%,
+    rgba(220, 38, 38, 0.6) 90%,
+    transparent 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: border-rotate 4s linear infinite;
+}
+
+/* Scanlines effect */
+.scanlines::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  z-index: 1;
+}
+
+/* Pulse glow animation for impostor card */
+@keyframes pulse-glow-red {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.2), 0 0 40px rgba(220, 38, 38, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(220, 38, 38, 0.4), 0 0 60px rgba(220, 38, 38, 0.2);
+  }
+}
+
+.pulse-glow-red {
+  animation: pulse-glow-red 2s ease-in-out infinite;
+}
+
+/* Floating particles */
+@keyframes float-up {
+  0% {
+    transform: translateY(100vh) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-10vh) scale(1);
+    opacity: 0;
+  }
 }
 
 /* Scrollbar styling */
@@ -88,4 +187,11 @@ body::after {
 ::selection {
   background: rgba(220, 38, 38, 0.3);
   color: #fafafa;
+}
+
+/* Smooth focus */
+:focus-visible {
+  outline: 2px solid rgba(220, 38, 38, 0.5);
+  outline-offset: 2px;
+  border-radius: 8px;
 }

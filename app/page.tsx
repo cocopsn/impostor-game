@@ -2,11 +2,13 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { useGameState } from '@/hooks/useGameState';
+import Background from '@/components/ui/Background';
 import HomeScreen from '@/components/screens/HomeScreen';
 import SetupScreen from '@/components/screens/SetupScreen';
 import RoleRevealScreen from '@/components/screens/RoleRevealScreen';
 import GameRoundScreen from '@/components/screens/GameRoundScreen';
 import VotingScreen from '@/components/screens/VotingScreen';
+import ManualVoteScreen from '@/components/screens/ManualVoteScreen';
 import RoundResultScreen from '@/components/screens/RoundResultScreen';
 import GameOverScreen from '@/components/screens/GameOverScreen';
 
@@ -22,6 +24,7 @@ export default function Home() {
 
   return (
     <main className="min-h-dvh">
+      <Background />
       <AnimatePresence mode="wait">
         {state.phase === 'home' && (
           <motion.div key="home" {...pageTransition}>
@@ -50,6 +53,12 @@ export default function Home() {
         {state.phase === 'voting' && (
           <motion.div key="voting" {...pageTransition}>
             <VotingScreen state={state} actions={actions} />
+          </motion.div>
+        )}
+
+        {state.phase === 'manual-vote' && (
+          <motion.div key="manual-vote" {...pageTransition}>
+            <ManualVoteScreen state={state} actions={actions} />
           </motion.div>
         )}
 
