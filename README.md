@@ -34,5 +34,6 @@ entran al mismo bote bajo la categoría "Personalizada" (`lib/gameLogic.ts → s
 
 ## Estado
 
-Proyecto personal, público, sin pruebas automatizadas. No hay `test` ni `typecheck`
-en `package.json` — solo `dev`, `build`, `start` y `lint`.
+Proyecto personal, público, sin pruebas automatizadas. `package.json` tiene
+exactamente tres scripts — `dev`, `build`, `start` — y ninguno de `test`,
+`typecheck` ni `lint`.
