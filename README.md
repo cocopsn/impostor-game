@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Impostor
 
-## Getting Started
+Juego de "el impostor" para jugar en un solo teléfono que se pasa de mano en mano.
+Todos ven la palabra menos uno; el resto tiene que descubrirlo antes de que él adivine.
 
-First, run the development server:
+Next.js 16 (App Router) · TypeScript · Tailwind · Framer Motion. **Sin backend, sin
+cuentas, sin red**: la partida entera vive en el estado del cliente.
+
+## Cómo correrlo
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+La entrada es `app/page.tsx`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Cómo está armado
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Pieza | Dónde |
+|---|---|
+| Reglas de la partida (elegir palabra, repartir roles, contar votos) | `lib/gameLogic.ts` |
+| Estado y temporizador | `hooks/useGameState.ts` · `hooks/useTimer.ts` |
+| Tipos del dominio | `types/game.ts` |
+| Banco de palabras | `components/WordBank.ts` |
+| Pantallas | `components/screens/` — 8: Home · Setup · RoleReveal · GameRound · Voting · ManualVote · RoundResult · GameOver |
 
-## Learn More
+## Banco de palabras
 
-To learn more about Next.js, take a look at the following resources:
+**14 categorías** (Futbol, Futbol Americano, Cine, Animales, Comida, Lugares, Musica,
+Videojuegos, Ciencia y Tecnologia, Series y TV, Superheroes y Ficcion, Marcas y
+Empresas, …). Se pueden **agregar palabras propias** desde la pantalla de configuración;
+entran al mismo bote bajo la categoría "Personalizada" (`lib/gameLogic.ts → selectWord`).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Estado
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Proyecto personal, público, sin pruebas automatizadas. No hay `test` ni `typecheck`
+en `package.json` — solo `dev`, `build`, `start` y `lint`.
